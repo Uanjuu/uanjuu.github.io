@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Uanju Globe v5</title>
+  <style>
+    body { margin: 0; background: black; font-family: sans-serif; overflow: hidden; }
+    #globeViz { position: absolute; width: 100%; height: 100%; }
+
+    .sidebar {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 200px;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 15px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+      font-size: 18px;
+      border-bottom: 1px solid #555;
+      padding-bottom: 8px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      margin-bottom: 10px;
+      cursor: pointer;
+      color: #8fe;
+    }
+
+    .sidebar li:hover {
+      text-decoration: underline;
+    }
+
+    .gallery-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    .gallery {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      max-width: 90%;
+      max-height: 80%;
+      overflow: auto;
+      justify-content: center;
+    }
+
+    .gallery img {
+      max-height: 300px;
+      border-radius: 8px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 24px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .gallery-title {
+      color: white;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        top: unset;
+        bottom: 0;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .sidebar ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="globeViz"></div>
+
+  <div class="sidebar">
+    <h3>📸 Explore Cities</h3>
+    <ul id="cityList"></ul>
+  </div>
+
+  <div id="galleryOverlay" class="gallery-overlay">
+    <button class="close-btn" onclick="hideGallery()">✖</button>
+    <div class="gallery-title" id="galleryTitle">City</div>
+    <div class="gallery" id="galleryContent"></div>
+  </div>
+
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script>
+    let globe;
+    fetch('photos.json')
+      .then(res => res.json())
+      .then(cities => {
+        globe = Globe()(document.getElementById('globeViz'))
+          .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+          .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+          .pointOfView({ lat: 30, lng: 60, altitude: 2.2 }, 0);
+
+        globe.controls().autoRotate = true;
+        globe.controls().autoRotateSpeed = 0.15;
+
+        globe
+          .pointsData(cities)
+          .pointLat(d => d.lat)
+          .pointLng(d => d.lng)
+          .pointAltitude(0.06)
+          .pointRadius(0.6)
+          .pointColor(() => 'cyan')
+          .pointLabel(d => d.city)
+          .onPointClick(d => showGallery(d.city, d.images));
+
+        const list = document.getElementById("cityList");
+        cities.forEach(city => {
+          const li = document.createElement("li");
+          li.textContent = city.city;
+          li.onclick = () => showGallery(city.city, city.images);
+          list.appendChild(li);
+        });
+      });
+
+    function showGallery(city, images) {
+      const overlay = document.getElementById("galleryOverlay");
+      const title = document.getElementById("galleryTitle");
+      const content = document.getElementById("galleryContent");
+
+      title.textContent = city;
+      content.innerHTML = "";
+      images.forEach(src => {
+        const img = document.createElement("img");
+        img.src = src;
+        content.appendChild(img);
+      });
+
+      overlay.style.display = "flex";
+      if (globe) globe.controls().autoRotate = false;
+    }
+
+    function hideGallery() {
+      document.getElementById("galleryOverlay").style.display = "none";
+      if (globe) globe.controls().autoRotate = true;
+    }
+  </script>
+</body>
+</html>

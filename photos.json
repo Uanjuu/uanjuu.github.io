@@ -1,0 +1,18 @@
+[
+  {
+    "city": "Kaohsiung",
+    "lat": 22.6273,
+    "lng": 120.3014,
+    "images": [
+      "kaohsiung.jpg"
+    ]
+  },
+  {
+    "city": "London",
+    "lat": 51.5074,
+    "lng": -0.1278,
+    "images": [
+      "london.jpg"
+    ]
+  }
+]
