@@ -1,0 +1,88 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Uanju Globe</title>
+  <style>
+    body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+    .tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      pointer-events: none;
+      font-size: 14px;
+      max-width: 300px;
+    }
+    .tooltip img {
+      width: 100%;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="globeViz"></div>
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script>
+    const globe = Globe()(document.getElementById('globeViz'))
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+      .pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 0);
+
+    globe.controls().autoRotate = true;
+    globe.controls().autoRotateSpeed = 0.5;
+
+    const controls = globe.controls();
+
+    // 偵測滑鼠進入地球範圍就暫停旋轉
+    globe.renderer().domElement.addEventListener('mouseenter', () => {
+      controls.autoRotate = false;
+    });
+    globe.renderer().domElement.addEventListener('mouseleave', () => {
+      controls.autoRotate = true;
+    });
+
+    const cities = [
+      {
+        city: "Paris",
+        lat: 48.8566,
+        lng: 2.3522,
+        date: "Dec 16, 2024",
+        photo: "https://drive.google.com/uc?export=view&id=1p3H0fpop8LKnjQKQj01tmRY3kRUHZ1oT"
+      },
+      {
+        city: "London",
+        lat: 51.5074,
+        lng: -0.1278,
+        date: "Dec 17, 2024",
+        photo: "https://drive.google.com/uc?export=view&id=1UGxe-9XAkiQxP9JVa_J2IeoMkx9Rddjs"
+      },
+      {
+        city: "Kaohsiung",
+        lat: 22.6273,
+        lng: 120.3014,
+        date: "Apr 26, 2024",
+        photo: "https://drive.google.com/uc?export=view&id=1aCU5DpY1ezedyM1CAH6h96yVE6bpGEM_"
+      }
+    ];
+
+    globe
+      .pointsData(cities)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointAltitude(0.02)
+      .pointColor(() => 'deepskyblue')
+      .pointLabel(d => `
+        <div>
+          <strong>${d.city}</strong><br/>
+          Date: ${d.date}<br/>
+          <img src="${d.photo}" alt="${d.city} photo"/>
+        </div>
+      `);
+  </script>
+</body>
+</html>
