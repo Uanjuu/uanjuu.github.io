@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Uanju Globe</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    html, body { margin: 0; overflow: hidden; background: black; color: white; font-family: sans-serif; }
+    #globeViz { position: absolute; width: 100%; height: 100%; z-index: 1; }
+    .gallery {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.88); z-index: 10; display: none;
+      flex-direction: column; align-items: center; justify-content: center;
+    }
+    .gallery h2 { margin: 0 0 20px; }
+    .gallery img { max-width: 80vw; max-height: 60vh; border-radius: 8px; }
+    .gallery button {
+      margin-top: 20px; padding: 10px 20px; font-size: 16px;
+      background: #fff; color: #000; border: none; border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false">
+  <div id="globeViz"></div>
+  <div class="gallery" id="gallery">
+    <h2 id="galleryTitle">Gallery</h2>
+    <img id="galleryImg" src="" />
+    <button onclick="document.getElementById('gallery').style.display='none'">Close</button>
+  </div>
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script>
+    const gallery = document.getElementById("gallery");
+    const galleryTitle = document.getElementById("galleryTitle");
+    const galleryImg = document.getElementById("galleryImg");
+
+    const globe = Globe()(document.getElementById("globeViz"))
+      .globeImageUrl(locationTimeBasedBg())
+      .backgroundImageUrl("//unpkg.com/three-globe/example/img/night-sky.png")
+      .pointLabel(d => `${d.city}, ${d.country}`)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointAltitude(0.06)
+      .pointRadius(0.4)
+      .pointColor(() => "cyan")
+      .onPointClick(d => {
+        galleryTitle.textContent = `${d.city}, ${d.country}`;
+        galleryImg.src = d.images[0];
+        gallery.style.display = "flex";
+      });
+
+    fetch('photos.json')
+      .then(res => res.json())
+      .then(data => {
+        globe.pointsData(data);
+      });
+
+    function locationTimeBasedBg() {
+      const hour = new Date().getHours();
+      return (hour >= 6 && hour < 18)
+        ? "//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+        : "//unpkg.com/three-globe/example/img/earth-night.jpg";
+    }
+  </script>
+</body>
+</html>
