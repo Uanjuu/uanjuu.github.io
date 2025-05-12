@@ -1,0 +1,25 @@
+[
+  {
+    "continent": "Asia",
+    "country": "Taiwan",
+    "city": "Kaohsiung",
+    "lat": 22.6273,
+    "lng": 120.3014,
+    "images": [
+      "kaohsiung.jpg",
+      "kaohsiung2.jpg"
+    ],
+    "description": "高雄：海與光的城市"
+  },
+  {
+    "continent": "Europe",
+    "country": "France",
+    "city": "Paris",
+    "lat": 48.8566,
+    "lng": 2.3522,
+    "images": [
+      "paris2.JPG"
+    ],
+    "description": "巴黎：午後的街道陽光"
+  }
+]
